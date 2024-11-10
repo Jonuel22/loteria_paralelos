@@ -1,0 +1,22 @@
+{
+    "loterias": [
+        {
+            "nombre": "Loteria_A",
+            "tiempoActualizacion": 30000,
+            "colorFondo": "#ff5733",
+            "efecto": "ruleta"
+        },
+        {
+            "nombre": "Loteria_B",
+            "tiempoActualizacion": 30000,
+            "colorFondo": "#33c1ff",
+            "efecto": "ruleta"
+        },
+        {
+            "nombre": "Loteria_C",
+            "tiempoActualizacion": 30000,
+            "colorFondo": "#7dff33",
+            "efecto": "ruleta"
+        }
+    ]
+}

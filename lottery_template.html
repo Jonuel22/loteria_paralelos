@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados de Lotería</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #222;
+            color: #fff;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1400px;
+        }
+        .lotteries {
+            display: flex;
+            flex-direction: column;
+            width: 70%;
+        }
+        .lottery {
+            width: 100%;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .lottery h2 {
+            margin: 0;
+            font-size: 1.8em;
+        }
+        .numbers {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .number {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 5px;
+            font-size: 1.5em;
+            width: 60px;
+            text-align: center;
+        }
+        .lottery-a { background-color: #ff5733; }
+        .lottery-b { background-color: #33c1ff; }
+        .lottery-c { background-color: #7dff33; }
+
+        /* Contador de próximo sorteo */
+        .next-draw {
+            margin-top: 10px;
+            font-size: 1.2em;
+            color: #ddd;
+        }
+
+        /* Columna de resultados anteriores */
+        .previous-results {
+            width: 30%;
+            padding: 20px;
+            background-color: #e0e0e0;
+            border-radius: 8px;
+            color: #333;
+        }
+        .previous-results h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+        .previous-lottery {
+            margin-bottom: 10px;
+        }
+        .previous-lottery h4 {
+            margin: 0;
+            font-size: 1.2em;
+            color: #555;
+        }
+        .previous-numbers {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 5px;
+        }
+        .previous-number {
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 1em;
+            width: 50px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Loterías -->
+        <div class="lotteries">
+            <div class="lottery lottery-a" id="loteriaA">
+                <h2>Lotería A</h2>
+                <div class="numbers">
+                    <div class="number" id="numA1">00</div>
+                    <div class="number" id="numA2">00</div>
+                    <div class="number" id="numA3">00</div>
+                </div>
+                <div class="next-draw" id="countdownA">Próximo sorteo en: 30s</div>
+            </div>
+
+            <div class="lottery lottery-b" id="loteriaB">
+                <h2>Lotería B</h2>
+                <div class="numbers">
+                    <div class="number" id="numB1">00</div>
+                    <div class="number" id="numB2">00</div>
+                    <div class="number" id="numB3">00</div>
+                </div>
+                <div class="next-draw" id="countdownB">Próximo sorteo en: 30s</div>
+            </div>
+
+            <div class="lottery lottery-c" id="loteriaC">
+                <h2>Lotería C</h2>
+                <div class="numbers">
+                    <div class="number" id="numC1">00</div>
+                    <div class="number" id="numC2">00</div>
+                    <div class="number" id="numC3">00</div>
+                </div>
+                <div class="next-draw" id="countdownC">Próximo sorteo en: 30s</div>
+            </div>
+        </div>
+
+        <!-- Resultados anteriores -->
+        <div class="previous-results">
+            <h3>Resultados Anteriores</h3>
+            <div id="previousA" class="previous-lottery">
+                <h4>Lotería A</h4>
+                <div class="previous-numbers">
+                    <div class="previous-number" id="prevA1">-</div>
+                    <div class="previous-number" id="prevA2">-</div>
+                    <div class="previous-number" id="prevA3">-</div>
+                </div>
+            </div>
+            <div id="previousB" class="previous-lottery">
+                <h4>Lotería B</h4>
+                <div class="previous-numbers">
+                    <div class="previous-number" id="prevB1">-</div>
+                    <div class="previous-number" id="prevB2">-</div>
+                    <div class="previous-number" id="prevB3">-</div>
+                </div>
+            </div>
+            <div id="previousC" class="previous-lottery">
+                <h4>Lotería C</h4>
+                <div class="previous-numbers">
+                    <div class="previous-number" id="prevC1">-</div>
+                    <div class="previous-number" id="prevC2">-</div>
+                    <div class="previous-number" id="prevC3">-</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ultimoResultadoA = [0, 0, 0];
+        let ultimoResultadoB = [0, 0, 0];
+        let ultimoResultadoC = [0, 0, 0];
+
+        function resetNumeros(ids) {
+            ids.forEach(id => {
+                document.getElementById(id).innerText = "00";
+            });
+        }
+
+        function actualizarResultadosAnteriores(ultimoResultado, prevIds) {
+            document.getElementById(prevIds[0]).innerText = ultimoResultado[0];
+            document.getElementById(prevIds[1]).innerText = ultimoResultado[1];
+            document.getElementById(prevIds[2]).innerText = ultimoResultado[2];
+        }
+
+        async function obtenerResultados(nombreLoteria, ids, prevIds, ultimoResultado) {
+            const response = await fetch(`http://localhost:3000/api/loteria/${nombreLoteria}`);
+            const data = await response.json();
+
+            resetNumeros(ids);
+            setTimeout(() => {
+                actualizarResultadosAnteriores(ultimoResultado, prevIds);
+                document.getElementById(ids[0]).innerText = data.numero1;
+                setTimeout(() => document.getElementById(ids[1]).innerText = data.numero2, 5000);
+                setTimeout(() => {
+                    document.getElementById(ids[2]).innerText = data.numero3;
+                    ultimoResultado[0] = data.numero1;
+                    ultimoResultado[1] = data.numero2;
+                    ultimoResultado[2] = data.numero3;
+                }, 10000);
+            }, 1000);
+        }
+
+        function actualizarLoterias() {
+            obtenerResultados("Loteria_A", ["numA1", "numA2", "numA3"], ["prevA1", "prevA2", "prevA3"], ultimoResultadoA);
+            obtenerResultados("Loteria_B", ["numB1", "numB2", "numB3"], ["prevB1", "prevB2", "prevB3"], ultimoResultadoB);
+            obtenerResultados("Loteria_C", ["numC1", "numC2", "numC3"], ["prevC1", "prevC2", "prevC3"], ultimoResultadoC);
+        }
+
+        function iniciarContadores() {
+            const intervalos = [30, 30, 30];
+            const countdowns = ["countdownA", "countdownB", "countdownC"];
+
+            setInterval(() => {
+                countdowns.forEach((id, index) => {
+                    const elemento = document.getElementById(id);
+                    intervalos[index]--;
+                    elemento.innerText = `Próximo sorteo en: ${intervalos[index]}s`;
+                    if (intervalos[index] <= 0) {
+                        intervalos[index] = 30;
+                    }
+                });
+            }, 1000);
+        }
+
+        setInterval(actualizarLoterias, 30000);
+        actualizarLoterias();
+        iniciarContadores();
+    </script>
+</body>
+</html>
