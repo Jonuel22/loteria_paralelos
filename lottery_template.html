@@ -13,71 +13,77 @@
             font-family: Arial, sans-serif;
             background-color: #222;
             color: #fff;
+            overflow: hidden;
         }
         .container {
             display: flex;
-            justify-content: space-between;
             width: 100%;
-            max-width: 1400px;
+            height: 100%;
+            max-width: 1280px;
+            max-height: 720px;
+            position: relative;
         }
-        .lotteries {
+
+        /* Video Container */
+        .live-stream-container {
+            flex: 2;
             display: flex;
-            flex-direction: column;
-            width: 70%;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            box-sizing: border-box;
+            position: relative;
         }
-        .lottery {
+        .live-stream video {
             width: 100%;
-            padding: 20px;
+            height: auto;
             border-radius: 8px;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        .lottery h2 {
-            margin: 0;
-            font-size: 1.8em;
-        }
-        .numbers {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 20px;
-        }
-        .number {
-            background-color: #333;
-            padding: 20px;
-            border-radius: 5px;
-            font-size: 1.5em;
-            width: 60px;
-            text-align: center;
-        }
-        .lottery-a { background-color: #ff5733; }
-        .lottery-b { background-color: #33c1ff; }
-        .lottery-c { background-color: #7dff33; }
-
-        /* Contador de próximo sorteo */
-        .next-draw {
-            margin-top: 10px;
-            font-size: 1.2em;
-            color: #ddd;
+            max-height: 100%;
         }
 
-        /* Columna de resultados anteriores */
+        /* Small Image Overlay on Top Left of Camera */
+.image-overlay {
+    position: absolute;
+    bottom: 10px; /* Ajusta la distancia desde el borde inferior */
+    left: 10px;   /* Ajusta la distancia desde el borde izquierdo */
+    width: 150px; /* Ancho del cuadro, similar al de "Resultados Anteriores" */
+    height: 100px; /* Altura del cuadro */
+    background: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 8px;
+    overflow: hidden;
+    display: none;
+    z-index: 2;
+}
+
+        .image-overlay img, .image-overlay video {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 8px;
+            object-fit: contain;
+        }
+
+        /* Previous Results (Sidebar) */
         .previous-results {
-            width: 30%;
-            padding: 20px;
+            flex: 1;
             background-color: #e0e0e0;
             border-radius: 8px;
             color: #333;
+            padding: 10px;
+            box-sizing: border-box;
+            max-width: 200px;
         }
         .previous-results h3 {
-            font-size: 1.5em;
-            margin-bottom: 15px;
+            font-size: 1.2em;
+            color: #222;
+            margin: 0 0 10px 0;
         }
         .previous-lottery {
             margin-bottom: 10px;
         }
         .previous-lottery h4 {
             margin: 0;
-            font-size: 1.2em;
+            font-size: 1em;
             color: #555;
         }
         .previous-numbers {
@@ -87,17 +93,146 @@
         }
         .previous-number {
             background-color: #f1f1f1;
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            width: 45px;
+            text-align: center;
+        }
+
+        /* Current Results (Footer) */
+        .lotteries {
+            display: flex;
+            justify-content: space-around;
+            background-color: #333;
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            box-sizing: border-box;
+        }
+        .lottery {
+            text-align: center;
+            width: 30%;
+            padding: 5px;
+            border-radius: 8px;
+        }
+        .lottery h2 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+        .numbers {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+        .number {
+            background-color: #555;
             padding: 10px;
             border-radius: 5px;
             font-size: 1em;
             width: 50px;
             text-align: center;
         }
+        .lottery-a { background-color: #ff5733; }
+        .lottery-b { background-color: #33c1ff; }
+        .lottery-c { background-color: #7dff33; }
+        
+        /* Countdown */
+        .next-draw {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #ddd;
+        }
+
+        /* Overlay for current lottery */
+        .overlay {
+            position: absolute;
+            bottom: 20%;
+            width: 70%;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+            text-align: center;
+        }
+        .overlay h2 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        .overlay-numbers {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        .overlay-number {
+            background-color: #555;
+            padding: 15px;
+            margin: 0 10px;
+            border-radius: 5px;
+            font-size: 1.2em;
+            width: 60px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Loterías -->
+        <!-- Video Container -->
+        <div class="live-stream-container">
+            <div class="live-stream">
+                <video id="liveVideo" autoplay muted></video>
+            </div>
+            <!-- Overlay for current lottery results -->
+            <div class="overlay" id="overlay">
+                <h2 id="overlayTitle">Lotería</h2>
+                <div class="overlay-numbers">
+                    <div class="overlay-number" id="overlayNum1">00</div>
+                    <div class="overlay-number" id="overlayNum2">00</div>
+                    <div class="overlay-number" id="overlayNum3">00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Small Image Overlay for images or videos on the top left of the camera -->
+        <div class="image-overlay" id="imageOverlay">
+            <img id="overlayImage" src="" alt="Imagen de Lotería" style="display: none;">
+            <video id="overlayVideo" autoplay muted loop style="display: none;"></video>
+        </div>
+
+        <!-- Previous Results Sidebar -->
+        <div class="previous-results">
+            <h3>Resultados Anteriores</h3>
+            <div id="previousA" class="previous-lottery">
+                <h4>Lotería A</h4>
+                <div class="previous-numbers">
+                    <div class="previous-number" id="prevA1">-</div>
+                    <div class="previous-number" id="prevA2">-</div>
+                    <div class="previous-number" id="prevA3">-</div>
+                </div>
+            </div>
+            <div id="previousB" class="previous-lottery">
+                <h4>Lotería B</h4>
+                <div class="previous-numbers">
+                    <div class="previous-number" id="prevB1">-</div>
+                    <div class="previous-number" id="prevB2">-</div>
+                    <div class="previous-number" id="prevB3">-</div>
+                </div>
+            </div>
+            <div id="previousC" class="previous-lottery">
+                <h4>Lotería C</h4>
+                <div class="previous-numbers">
+                    <div class="previous-number" id="prevC1">-</div>
+                    <div class="previous-number" id="prevC2">-</div>
+                    <div class="previous-number" id="prevC3">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Results Footer -->
         <div class="lotteries">
             <div class="lottery lottery-a" id="loteriaA">
                 <h2>Lotería A</h2>
@@ -129,97 +264,129 @@
                 <div class="next-draw" id="countdownC">Próximo sorteo en: 30s</div>
             </div>
         </div>
-
-        <!-- Resultados anteriores -->
-        <div class="previous-results">
-            <h3>Resultados Anteriores</h3>
-            <div id="previousA" class="previous-lottery">
-                <h4>Lotería A</h4>
-                <div class="previous-numbers">
-                    <div class="previous-number" id="prevA1">-</div>
-                    <div class="previous-number" id="prevA2">-</div>
-                    <div class="previous-number" id="prevA3">-</div>
-                </div>
-            </div>
-            <div id="previousB" class="previous-lottery">
-                <h4>Lotería B</h4>
-                <div class="previous-numbers">
-                    <div class="previous-number" id="prevB1">-</div>
-                    <div class="previous-number" id="prevB2">-</div>
-                    <div class="previous-number" id="prevB3">-</div>
-                </div>
-            </div>
-            <div id="previousC" class="previous-lottery">
-                <h4>Lotería C</h4>
-                <div class="previous-numbers">
-                    <div class="previous-number" id="prevC1">-</div>
-                    <div class="previous-number" id="prevC2">-</div>
-                    <div class="previous-number" id="prevC3">-</div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script>
-        let ultimoResultadoA = [0, 0, 0];
-        let ultimoResultadoB = [0, 0, 0];
-        let ultimoResultadoC = [0, 0, 0];
+        // Acceso a la cámara
+        async function iniciarCamara() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const video = document.getElementById("liveVideo");
+                video.srcObject = stream;
+            } catch (error) {
+                console.error("Error al acceder a la cámara:", error);
+            }
+        }
 
-        function resetNumeros(ids) {
-            ids.forEach(id => {
-                document.getElementById(id).innerText = "00";
+        async function cargarResultadosAnteriores() {
+            const loterias = [
+                { id: "Loteria_A", prevElements: ["prevA1", "prevA2", "prevA3"] },
+                { id: "Loteria_B", prevElements: ["prevB1", "prevB2", "prevB3"] },
+                { id: "Loteria_C", prevElements: ["prevC1", "prevC2", "prevC3"] }
+            ];
+            loterias.forEach(async (loteria) => {
+                const response = await fetch(`http://localhost:3000/api/loteria/${loteria.id}/anterior`);
+                const data = await response.json();
+                document.getElementById(loteria.prevElements[0]).innerText = data.numero1;
+                document.getElementById(loteria.prevElements[1]).innerText = data.numero2;
+                document.getElementById(loteria.prevElements[2]).innerText = data.numero3;
             });
         }
 
-        function actualizarResultadosAnteriores(ultimoResultado, prevIds) {
-            document.getElementById(prevIds[0]).innerText = ultimoResultado[0];
-            document.getElementById(prevIds[1]).innerText = ultimoResultado[1];
-            document.getElementById(prevIds[2]).innerText = ultimoResultado[2];
+        function animarRuleta(id, numeroFinal) {
+            const elemento = document.getElementById(id);
+            let contador = 0;
+            const interval = setInterval(() => {
+                elemento.innerText = Math.floor(Math.random() * 100);
+                contador++;
+                if (contador > 10) {
+                    clearInterval(interval);
+                    elemento.innerText = numeroFinal;
+                }
+            }, 100);
         }
 
-        async function obtenerResultados(nombreLoteria, ids, prevIds, ultimoResultado) {
+        async function presentarEnOverlay(nombreLoteria, numeros) {
+            const overlay = document.getElementById("overlay");
+            document.getElementById("overlayTitle").innerText = nombreLoteria;
+            const overlayNumbers = ["overlayNum1", "overlayNum2", "overlayNum3"];
+            
+            overlay.style.display = "block";
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    animarRuleta(overlayNumbers[i], numeros[i]);
+                }, i * 2000);
+            }
+            await new Promise((resolve) => setTimeout(resolve, 7000));
+            overlay.style.display = "none";
+        }
+
+        async function obtenerResultados(nombreLoteria, ids) {
             const response = await fetch(`http://localhost:3000/api/loteria/${nombreLoteria}`);
             const data = await response.json();
-
-            resetNumeros(ids);
-            setTimeout(() => {
-                actualizarResultadosAnteriores(ultimoResultado, prevIds);
-                document.getElementById(ids[0]).innerText = data.numero1;
-                setTimeout(() => document.getElementById(ids[1]).innerText = data.numero2, 5000);
+            await presentarEnOverlay(nombreLoteria.replace("_", " "), [data.numero1, data.numero2, data.numero3]);
+            ids.forEach((id, index) => {
                 setTimeout(() => {
-                    document.getElementById(ids[2]).innerText = data.numero3;
-                    ultimoResultado[0] = data.numero1;
-                    ultimoResultado[1] = data.numero2;
-                    ultimoResultado[2] = data.numero3;
-                }, 10000);
-            }, 1000);
+                    animarRuleta(id, data[`numero${index + 1}`]);
+                }, index * 2000);
+            });
         }
 
         function actualizarLoterias() {
-            obtenerResultados("Loteria_A", ["numA1", "numA2", "numA3"], ["prevA1", "prevA2", "prevA3"], ultimoResultadoA);
-            obtenerResultados("Loteria_B", ["numB1", "numB2", "numB3"], ["prevB1", "prevB2", "prevB3"], ultimoResultadoB);
-            obtenerResultados("Loteria_C", ["numC1", "numC2", "numC3"], ["prevC1", "prevC2", "prevC3"], ultimoResultadoC);
+            obtenerResultados("Loteria_A", ["numA1", "numA2", "numA3"]).then(() => {
+                obtenerResultados("Loteria_B", ["numB1", "numB2", "numB3"]).then(() => {
+                    obtenerResultados("Loteria_C", ["numC1", "numC2", "numC3"]);
+                });
+            });
         }
 
         function iniciarContadores() {
-            const intervalos = [30, 30, 30];
+            const intervalos = [35, 35, 35];
             const countdowns = ["countdownA", "countdownB", "countdownC"];
-
             setInterval(() => {
                 countdowns.forEach((id, index) => {
                     const elemento = document.getElementById(id);
                     intervalos[index]--;
                     elemento.innerText = `Próximo sorteo en: ${intervalos[index]}s`;
                     if (intervalos[index] <= 0) {
-                        intervalos[index] = 30;
+                        intervalos[index] = 35;
                     }
                 });
             }, 1000);
         }
 
-        setInterval(actualizarLoterias, 30000);
+        // Mostrar imagen o video en el overlay pequeño a la izquierda de la cámara
+        function mostrarImagenVideo(tipo, ruta, duracion) {
+            const overlay = document.getElementById("imageOverlay");
+            const overlayImage = document.getElementById("overlayImage");
+            const overlayVideo = document.getElementById("overlayVideo");
+
+            if (tipo === "imagen") {
+                overlayImage.src = ruta;
+                overlayImage.style.display = "block";
+                overlayVideo.style.display = "none";
+            } else if (tipo === "video") {
+                overlayVideo.src = ruta;
+                overlayVideo.style.display = "block";
+                overlayImage.style.display = "none";
+            }
+
+            overlay.style.display = "block";
+
+            setTimeout(() => {
+                overlay.style.display = "none";
+                overlayImage.style.display = "none";
+                overlayVideo.style.display = "none";
+                overlayVideo.src = "";
+                overlayImage.src = "";
+            }, duracion * 1000);
+        }
+
+        setInterval(actualizarLoterias, 35000);
         actualizarLoterias();
         iniciarContadores();
+        iniciarCamara();
+        cargarResultadosAnteriores();
     </script>
 </body>
 </html>

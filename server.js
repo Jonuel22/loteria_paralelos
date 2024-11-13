@@ -46,6 +46,23 @@ app.get('/api/loteria/:nombre/anterior', (req, res) => {
     );
 });
 
+
+// Endpoint para obtener la última dirección de imagen y su duración
+app.get('/api/imagen', (req, res) => {
+    db.query(
+        `SELECT direccion, duracion FROM imagenes ORDER BY id DESC LIMIT 1`,
+        (err, results) => {
+            if (err) throw err;
+            if (results.length > 0) {
+                res.json({ direccion: results[0].direccion, duracion: results[0].duracion });
+            } else {
+                res.json({ direccion: null, duracion: null });
+            }
+        }
+    );
+});
+
+
 app.listen(PORT, () => {
     console.log(`Servidor API en ejecución en http://localhost:${PORT}`);
 });
